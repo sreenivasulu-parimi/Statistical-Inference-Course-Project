@@ -1,0 +1,148 @@
+---
+title: "The Effect of Vitamin C on Tooth Growth in Guinea Pigs"
+author: "Sreenivasulu Parimi"
+date: "May 27, 2018"
+output:
+  html_document: default
+  word_document: default
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Statistical Inference Course Project - Part 2: Basic Inferential Data Analysis
+
+## A. Overview
+This is for second part of the course project of the Coursera course 'Statistical Inference' which is a part of 'Data Science' specialization. In this second part, we perform basic inferential analyses using the ToothGrowth data in the R datasets package.
+
+### 1. Load the ToothGrowth data and perform some basic exploratory data analyses
+
+Load the required Packages:
+```{r}
+library(datasets)
+library(ggplot2)
+library(dplyr)
+```
+
+Load the data and run the basic exploratory analysis:
+```{r}
+data("ToothGrowth")
+tooth_growth <- ToothGrowth
+dim(tooth_growth)
+head(tooth_growth)
+tail(tooth_growth)
+str(tooth_growth)
+
+# Unique Values
+unique(ToothGrowth$len)
+unique(ToothGrowth$supp)
+unique(ToothGrowth$dose)
+```
+
+The variable 'dose' can be converted into a factor variable as it seems that it is rather a level than a numeric.
+```{r}
+# convert variable dose from numeric to factor
+tooth_growth$dose <- as.factor(tooth_growth$dose)
+str(tooth_growth)
+```
+
+## B. Visualization
+
+### 2. Provide a basic summary of the data
+
+Summary statistics for the data:
+```{r}
+summary(tooth_growth)
+```
+
+
+```{r}
+# Structure
+plot(tooth_growth)
+
+# Tooth Growth Histogram
+hist(tooth_growth$len, col = "red",main = "Histogram of Tooth Growth", xlab = "Length (mm)", ylab = "Frequency")
+```
+
+So far our analysis says that there are 60 observations, 2 types of supplements (OJ - Orange Juice & VC -Ascorbic Acid), 3 dosage sizes (0.5, 1.0, & 2mg), with more than half of the tooth length observations falling within the range of 15 - 30 mm.
+
+#### Impact of dosage and supplement on the tooth growth
+
+```{r}
+# Box plot
+ggplot(tooth_growth, aes(x=dose, y=len)) + geom_boxplot(aes(fill=factor(dose))) + geom_point() + facet_grid(.~supp) + ggtitle("dose and supplement impact on tooth growth")
+
+
+# Bar graph
+ggplot(data=tooth_growth, aes(x=dose, y=len, fill=supp)) + geom_bar(stat="identity",) + facet_grid(. ~ supp) + xlab("Dose in miligrams") + ylab("Tooth length") + guides(fill=guide_legend(title="Supplement type"))
+```
+
+The above graphs shows that dose has an effect on tooth length. When the dosage is high at 2 mg, the mean value of tooth growth appears to be similar between OJ and VC, however, when the dosage is 0.5 mg or 1 mg, the chart definitely shows that OJ has a obvious positive impact on tooth growth compared to VC.
+
+## C. Statistical Inference
+
+### 3. Use confidence intervals and/or hypothesis tests to compare tooth growth by supp and dose. (Only use the techniques from class, even if there's other approaches worth considering)
+
+In order to cross verify if the above insights drawn from above visual/graphical analysis are statistically valid, we perform Hypothesis/T-Tests for the tooth length as the outcome predicted by three separate vectors.
+
+#### Effect on tooth growth/length by supplement types
+
+- $H_{0}$: Tooth length is not affected by supplement types delivery method.
+- $H_{a}$: Tooth length is affected by supplement types delivery method.
+
+```{r}
+t.test(len ~ supp, data=tooth_growth)
+```
+
+The p-value is 0.06063 which is greater than the significance level of 0.05 and the 95% confidence interval (-0.1710156  7.5710156) which includes 0 This indicates that we can't reject the $H_{0}$ null hypothesis that supplement types (OJ and/or VC) seems to have no impact on Tooth growth based on this test. So we can conclude that different supplement types have no effect on tooth length.
+
+#### Effect on tooth growth/length by various dosage
+
+- $H_{0}$: Tooth length is not affected by dose level
+
+```{r}
+t.test(len ~ dose, data=subset(tooth_growth, dose %in% c(0.5, 1.0)))
+t.test(len ~ dose, data=subset(tooth_growth, dose %in% c(0.5, 2.0)))
+t.test(len ~ dose, data=subset(tooth_growth, dose %in% c(1.0, 2.0)))
+```
+
+
+For all the above three dose level pairs, the p-value is less than 0.05, and the 95% confidence interval doesn't include 0. This indicates that we can reject the $H_{0}$ null hypothesis, and establish that increasing the dose level leads to an increase in tooth length. The mean tooth length increases on raising the dose level.
+
+#### Effect on tooth growth/length by supplement types and various dosage
+
+* $H_{0}$: Tooth length is not affected by supplement types at a 0.5 mg dose
+* $H_{1}$: Tooth length is not affected by supplement types at a 1.0 mg dose
+* $H_{2}$: Tooth length is not affected by supplement types at a 2.0 mg dose
+
+```{r}
+t.test(len ~ supp, data = filter(tooth_growth, dose == 0.5), paired = F, var.equal = F)
+t.test(len ~ supp, data = filter(tooth_growth, dose == 1.0), paired = F, var.equal = F)
+```
+
+$H_{0}$ and $H_{1}$: Since the p-value is less than 0.05 and the 95% confidence interval doesn't cross/include 0 for above two tests, we can reject $H_{0}$ and $H_{1}$ with at least a 95% confidence interval.
+
+```{r}
+t.test(len ~ supp, data = filter(tooth_growth, dose == 2.0), paired = F, var.equal = F)
+```
+
+$H_{2}$: Since the p-value is greater than 0.05 and the 95% confidence interval crosses/includes zero, we can not reject the $H_{2}$ within a 95% confidence interval.
+
+### 4. State your conclusions and the assumptions needed for your conclusions
+
+#### Conclusions
+
+We can come to the following conclusions based insights drawn from above analysis.
+
+* Supplement type has no impact of thooth growth
+* There is a strong evidence includes that inreasing the dose level leads to increased tooth growth
+
+
+#### Assumptions
+
+We assumed the following in order to come to above conclusions
+
+* supp is independent from dose
+* The experiment was done with random assignment of guinea pigs to different dose levels  and supplement type
+* Populations of guinea pigs were independent

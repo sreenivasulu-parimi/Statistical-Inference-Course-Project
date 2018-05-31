@@ -1,6 +1,9 @@
 # Statistical-Inference-Course-Project
 
 ## Part 1: A simulation exercise
+
+Link on <a href="http://rpubs.com/parimi/393298" target="_blank">RPubs</a>
+
 In this project you will investigate the exponential distribution in R and compare it with the Central Limit Theorem. The exponential distribution can be simulated in R with rexp(n, lambda) where lambda is the rate parameter. The mean of exponential distribution is 1/lambda and the standard deviation is also 1/lambda. **Set lambda = 0.2 for all of the simulations.** You will investigate the distribution of averages of 40 exponentials. Note that you will need to do a thousand simulations.  
 
 Illustrate via simulation and associated explanatory text the properties of the distribution of the mean of 40 exponentials.  You should  
@@ -43,6 +46,9 @@ A sample set of headings that could be used to guide the creation of your report
 * Distribution: Via figures and text, explain how one can tell the distribution is approximately normal.
 
 ## Part 2: Basic inferential data analysis
+
+Link on <a href="http://rpubs.com/parimi/393297" target="_blank">RPubs</a>
+
 Now in the second portion of the class, we're going to analyze the ToothGrowth data in the R datasets package.   
 
 1. Load the ToothGrowth data and perform some basic exploratory data analyses 
